@@ -1,19 +1,17 @@
 
-import javax.swing.*;
+import javax.swing.JButton;
 
-public abstract class GameStage {
+public interface GameStage {
 
-    private JFrame frame;
-    private Narration narration;
-
-    public GameStage(JFrame frame, Narration narration) {
-        this.frame = frame;
-        this.narration = narration;
-    }
-
-    public abstract void showStage();
-    public abstract  void displayNarration(String narrationText);
-    public abstract void displayChoices(JButton... buttons);
-
-
+    void showStoryline();
+    void showStage();
+    void displayNarration(String narrationText);
+    void displayChoices(JButton... choices);
+    void displaySpeakerName(String speakerName);
+    void displayDialogue(String dialogue);
+    void createDialogBox(); // Method to create the dialog box
+    void setupMainFrame(); // Method to setup the main frame
+    void blackScreen();
+    void straightDialogue();
+    void typeWriterEffect(String text, int delay);
 }
