@@ -9,10 +9,8 @@ public class Chapter1 implements GameStage {
     private JFrame frame;
     private Narration narration;
     private Timer currentTimer;
-    private int dialogueIndex = 5; // Start at dialogue 6 for `straightDialogue`
-    private String speaker;
-    private String text;
-
+    private int dialogueIndex = 0; // Start at dialogue 6 for `straightDialogue`
+    private int counter = 0;
 
     public Chapter1(JFrame frame, Narration narration) {
         this.frame = frame;
@@ -218,30 +216,25 @@ public class Chapter1 implements GameStage {
     @Override
     public void straightDialogue() {
         System.out.print("Successfully!");
-        dialogueIndex = 5; // Start from the specified index
-        boolean isDone = false;
-        String[] speaker = {"Main Character", "Speaker"};
-        int i = 0;
+        dialogueIndex = 5; 
         int stop = 7;
-        // Check if the dialogue exists
+        boolean isDone = false;
+
+        String[] speakers = {"Speaker", "Main Character"};
         if (dialogueIndex < stop) {
-            isDone = true;
-            System.out.println("Dialogue at index 5: " + text); // Debug statement
-            displayDialogue(dialogueIndex, stop, speaker[i++]);
-            if(dialogueIndex < stop){
-                isDone = false;
+            isDone = true;  
+            System.out.println("Starting dialogue...");
+            displayDialogue(dialogueIndex, stop, speakers);
+            if (dialogueIndex < stop) {
+                isDone = false;  
             }
         } else {
-            System.out.println("No dialogue found at index 5.");
+            System.out.println("No dialogue found at this index.");
         }
-
-        if(isDone){
-            displayPlanet();
-
+        if (isDone) {
+            displayPlanet();  
         }
     }
-
-
 
     public void displayPlanet() {
         JPanel explorationPanel = new JPanel();
@@ -273,14 +266,13 @@ public class Chapter1 implements GameStage {
             for (char c : text.toCharArray()) {
                 textArea.append(String.valueOf(c)); // Add one character at a time
                 try {
-                    Thread.sleep(50); // Adjust speed (in milliseconds) of the typing effect
+                    Thread.sleep(30); // Adjust speed (in milliseconds) of the typing effect
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
         }).start();
     }
-
 
     public void typeWriterEffect(String text, int delay, Runnable onComplete) {
         // Clear any previous text
@@ -327,7 +319,7 @@ public class Chapter1 implements GameStage {
 
     private void continueSleeping() {
         if (narration != null && narration.getDialogueCount() > 3) {
-            typeWriterEffect(narration.getDialogue(3), 70, () -> {
+            typeWriterEffect(narration.getDialogue(3), 60, () -> {
                 JButton checkNotif = new JButton("Check the notification");
                 checkNotif.addActionListener(a -> checkEmail());
                 displayChoices(checkNotif);
@@ -337,7 +329,7 @@ public class Chapter1 implements GameStage {
 
     private void checkEmail() {
         if (narration != null && narration.getDialogueCount() > 4) {
-            typeWriterEffect(narration.getDialogue(4), 90, () -> {
+            typeWriterEffect(narration.getDialogue(4), 50, () -> {
                 // Callback executed after typewriter effect
                 JPanel explorationPanel = new JPanel();
                 explorationPanel.setBackground(Color.BLACK);
@@ -350,7 +342,7 @@ public class Chapter1 implements GameStage {
                 frame.repaint();
 
                 // Start a timer to proceed to straight dialogue
-                Timer timer = new Timer(2500, e -> {
+                Timer timer = new Timer(3000, e -> {
                     System.out.println("Success");
                     straightDialogue(); // Proceed to straight dialogue
                 });
@@ -361,8 +353,6 @@ public class Chapter1 implements GameStage {
         }
     }
 
-
-    
     private void showDialogue(JTextArea storyTextArea, int dialogueIndex) {
         if (dialogueIndex >= narration.getDialogueCount()) {
             showStage();
@@ -397,7 +387,7 @@ public class Chapter1 implements GameStage {
 
 // Overloaded showDialogue method with speaker's name
 // Modified showDialogue method to accept JTextArea and display the text
-private void dialogue(JTextArea storyTextArea, String dialogueText, int index) {
+    private void dialogue(JTextArea storyTextArea, String dialogueText, int index) {
         Timer dialogueTimer = new Timer(75, new ActionListener() {
             int charIndex = 0;
 
@@ -423,6 +413,7 @@ private void dialogue(JTextArea storyTextArea, String dialogueText, int index) {
         });
         dialogueTimer.start(); // Start the typing effect
     }
+
     private void showNextDialogue(JTextArea storyTextArea) {
         if (dialogueIndex < narration.getDialogueCount() - 1) {
             dialogueIndex++; // Move to the next dialogue
@@ -434,8 +425,7 @@ private void dialogue(JTextArea storyTextArea, String dialogueText, int index) {
         }
     }
 
-
-    private void displayDialogue(int startIndex, int endIndex, String speakerName) {
+    private void displayDialogue(int startIndex, int endIndex, String[] speakerNames) {
         // Check if the current dialogue index is within the specified range
         if (dialogueIndex < startIndex || dialogueIndex >= endIndex) {
             System.out.println("Dialogue index out of range.");
@@ -448,7 +438,8 @@ private void dialogue(JTextArea storyTextArea, String dialogueText, int index) {
         dialoguePanel.setBackground(new Color(30, 30, 30)); // Darker background
 
         // Create a label for the speaker's name
-        JLabel speakerLabel = new JLabel(speakerName);
+        String currentSpeakerName = speakerNames[dialogueIndex % speakerNames.length]; // Get current speaker name
+        JLabel speakerLabel = new JLabel(currentSpeakerName);
         speakerLabel.setForeground(Color.YELLOW); // Bright color for visibility
         speakerLabel.setFont(new Font("Serif", Font.BOLD, 22));
         speakerLabel.setHorizontalAlignment(SwingConstants.LEFT);
@@ -464,6 +455,8 @@ private void dialogue(JTextArea storyTextArea, String dialogueText, int index) {
         dialogueTextArea.setOpaque(false);
         dialogueTextArea.setMargin(new Insets(20, 20, 20, 20));
 
+        dialogueTextArea.setPreferredSize(new Dimension(500, 150)); // Fixed width and height
+
         dialoguePanel.add(dialogueTextArea, BorderLayout.CENTER);
 
         // Create the Next button
@@ -478,12 +471,13 @@ private void dialogue(JTextArea storyTextArea, String dialogueText, int index) {
         // Action listener for the Next button
         nextButton.addActionListener(e -> {
             dialogueIndex++; // Move to the next dialogue
+            counter++;
             if (dialogueIndex < endIndex) {
                 dialogueTextArea.setText(""); // Clear the current text
-                displayDialogue(startIndex, endIndex, speakerName); // Display the next dialogue
+
+                displayDialogue(startIndex, endIndex, speakerNames); // Display the next dialogue with the speakerNames array
             } else {
                 System.out.println("End of dialogues."); // Optionally handle the end
-                // You can also add code here to transition to the next part of the story or exploration
             }
         });
 
@@ -497,8 +491,8 @@ private void dialogue(JTextArea storyTextArea, String dialogueText, int index) {
 
         // Start the typewriter effect on the dialogue text
         String dialogue = narration.getDialogue(dialogueIndex);
+
         typeWriterEffect(dialogueTextArea, dialogue);
     }
-
 
 }
