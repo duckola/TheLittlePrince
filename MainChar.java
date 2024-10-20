@@ -29,7 +29,7 @@ public class MainChar extends Base{
             @Override
             public void run() {
                 canUseSkill2 = true; // Skill 2 becomes available after 5 seconds
-                System.out.println("Your Skill 2 is now available!");
+                System.out.println("You Skill 2 is now available!");
             }
         }, 5000); // 5 seconds delay
 
