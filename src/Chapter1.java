@@ -10,12 +10,14 @@ public class Chapter1 implements GameStage {
     private Narration narration;
     private Timer currentTimer;
     private int dialogueIndex = 0; // Start at dialogue 6 for `straightDialogue`
-    private int counter = 0;
 
     public Chapter1(JFrame frame, Narration narration) {
         this.frame = frame;
         this.narration = narration;
     }
+
+    //fighting logic and exploration logic:
+
 
     @Override
     public void showStoryline() {
@@ -74,37 +76,29 @@ public class Chapter1 implements GameStage {
 
     @Override
     public void showStage() {
-        // Create the main exploration panel
         JPanel explorationPanel = new JPanel();
         explorationPanel.setBackground(Color.BLACK);
         explorationPanel.setLayout(new BorderLayout());
 
-        // Create the exploration label
         JLabel explorationLabel = new JLabel("<html><center>BEYOND THE STARS: Trials of Survival<br> Chapter 1: The Beginning After The End</center></html>");
         explorationLabel.setForeground(Color.WHITE);
         explorationLabel.setFont(new Font("Serif", Font.BOLD, 24));
         explorationLabel.setHorizontalAlignment(SwingConstants.CENTER);
         explorationPanel.add(explorationLabel, BorderLayout.CENTER);
 
-        // Display the initial exploration panel
         frame.getContentPane().removeAll();
         frame.add(explorationPanel, BorderLayout.CENTER);
         frame.revalidate();
         frame.repaint();
 
-        // Timer for delayed narration display
         Timer timer = new Timer(2000, e -> {
-            // Typewriter effect for the dialogue, and display choices afterward
             typeWriterEffect(narration.getDialogue(1), 50, () -> {
-                // Display choices after the typewriter effect is complete
                 JButton checkPhoneButton = new JButton("Check the phone");
                 JButton continueSleepingButton = new JButton("Continue sleeping");
 
-                // Add action listeners for the buttons
                 checkPhoneButton.addActionListener(a -> checkPhone());
                 continueSleepingButton.addActionListener(a -> continueSleeping());
 
-                // Call the displayChoices method to show options
                 displayChoices(checkPhoneButton, continueSleepingButton);
             });
         });
@@ -216,43 +210,17 @@ public class Chapter1 implements GameStage {
     @Override
     public void straightDialogue() {
         System.out.print("Successfully!");
-        dialogueIndex = 5; 
+        dialogueIndex = 5;
         int stop = 7;
-        boolean isDone = false;
 
         String[] speakers = {"Speaker", "Main Character"};
         if (dialogueIndex < stop) {
-            isDone = true;  
             System.out.println("Starting dialogue...");
             displayDialogue(dialogueIndex, stop, speakers);
-            if (dialogueIndex < stop) {
-                isDone = false;  
-            }
         } else {
             System.out.println("No dialogue found at this index.");
         }
-        if (isDone) {
-            displayPlanet();  
-        }
-    }
 
-    public void displayPlanet() {
-        JPanel explorationPanel = new JPanel();
-        explorationPanel.setBackground(Color.GRAY);
-
-        explorationPanel.setLayout(new BorderLayout());
-
-        JLabel explorationLabel = new JLabel("<html><center>ASTEROID B-612</center></html>");
-        explorationLabel.setForeground(Color.WHITE);
-        explorationLabel.setFont(new Font("Serif", Font.BOLD, 24));
-        explorationLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        explorationPanel.add(explorationLabel, BorderLayout.CENTER);
-
-        // Display the initial exploration panel
-        frame.getContentPane().removeAll();
-        frame.add(explorationPanel, BorderLayout.CENTER);
-        frame.revalidate();
-        frame.repaint();
     }
 
     @Override
@@ -353,6 +321,116 @@ public class Chapter1 implements GameStage {
         }
     }
 
+    public void displayPlanet() {
+        JPanel explorationPanel = new JPanel();
+        explorationPanel.setBackground(Color.GRAY);
+
+        explorationPanel.setLayout(new BorderLayout());
+
+        JLabel explorationLabel = new JLabel("<html><center>ASTEROID B-612</center></html>");
+        explorationLabel.setForeground(Color.WHITE);
+        explorationLabel.setFont(new Font("Serif", Font.BOLD, 24));
+        explorationLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        explorationPanel.add(explorationLabel, BorderLayout.CENTER);
+
+        // Display the initial exploration panel
+        frame.getContentPane().removeAll();
+        frame.add(explorationPanel, BorderLayout.CENTER);
+        frame.revalidate();
+        frame.repaint();
+
+        System.out.print("Successfully!");
+        dialogueIndex = 8;
+        int stop = 10;
+
+        String[] speakers = {"Little Prince", "Rose"};
+        Timer timer = new Timer(3000, e -> {
+            if (dialogueIndex < stop) {
+                System.out.println("Starting dialogue...");
+                displayDialogue(dialogueIndex, stop, speakers);
+            } else {
+                System.out.println("No dialogue found at this index.");
+            }
+        });
+
+        // Only fire the Timer once
+        timer.setRepeats(false);
+        timer.start();
+    }
+
+    private void talkToRose() {
+        typeWriterEffect(narration.getDialogue(11), 30, () -> {
+            JButton talkToRose = new JButton("Talk To Rose");
+            String[] speakers = {"Main Character", "Rose"};
+            dialogueIndex = 12;
+            int stop = 14;
+            if (dialogueIndex < stop) {
+                System.out.println("Starting dialogue...");
+                talkToRose.addActionListener(a -> displayDialogue(dialogueIndex, stop, speakers));
+            }
+            displayChoices(talkToRose);
+        });
+    }
+
+    private void talkToPrince() {
+        String[] speakers = {"Main Character", "Little Prince"};
+        dialogueIndex = 14;
+        int stop = 20;
+        if (dialogueIndex < stop) {
+            System.out.println("Starting dialogue...");
+            displayDialogue(dialogueIndex, stop, speakers);
+        }
+    }
+
+    private void nextPlanet() {
+        typeWriterEffect("The next day...", 60, () -> {
+            Timer timer = new Timer(3000, e1 -> {
+                typeWriterEffect(narration.getDialogue(20), 50, () -> {
+                    String[] speakers = {"Speaker"};
+                    dialogueIndex = 21;
+                    displayDialogue(dialogueIndex, 22, speakers);
+                });
+            });
+            timer.setRepeats(false);
+            timer.start();
+        });
+    }
+
+    private void displayNextPlanet(){
+        Timer timer2 = new Timer(3000, e2 -> {
+            JLabel phase2JLabel = new JLabel("<html><center><b>The Vain Man Planet: Asteroid B-326 <\b>\n Planet 1: Gallery of the Flaring Statuette  </center></html>");
+            phase2JLabel.setForeground(Color.WHITE);
+            phase2JLabel.setFont(new Font("Serif", Font.BOLD, 24));
+            phase2JLabel.setHorizontalAlignment(SwingConstants.CENTER);
+            phase2JLabel.add(phase2JLabel, BorderLayout.CENTER);
+
+            frame.getContentPane().removeAll();
+            frame.add(phase2JLabel, BorderLayout.CENTER);
+            frame.revalidate();
+            frame.repaint();
+
+            String[] speakers = {" Speaker", " Main Character"};
+            dialogueIndex = 22;
+            int stop = 24;
+            Timer timer3 = new Timer(3000, e3 -> {
+                if (dialogueIndex < stop) {
+                    System.out.println("Starting dialogue...");
+                    displayDialogue(dialogueIndex, stop, speakers);
+                } else {
+                    System.out.println("No dialogue found at this index.");
+                }
+            });
+
+            // Only fire the Timer once
+            timer3.setRepeats(false);
+            timer3.start();
+        });
+
+        // Only fire the Timer once
+        timer2.setRepeats(false);
+        timer2.start();
+    }
+
     private void showDialogue(JTextArea storyTextArea, int dialogueIndex) {
         if (dialogueIndex >= narration.getDialogueCount()) {
             showStage();
@@ -385,8 +463,6 @@ public class Chapter1 implements GameStage {
         currentTimer.start();
     }
 
-// Overloaded showDialogue method with speaker's name
-// Modified showDialogue method to accept JTextArea and display the text
     private void dialogue(JTextArea storyTextArea, String dialogueText, int index) {
         Timer dialogueTimer = new Timer(75, new ActionListener() {
             int charIndex = 0;
@@ -432,12 +508,10 @@ public class Chapter1 implements GameStage {
             return; // Exit if the index is out of range
         }
 
-        // Create a new JPanel for the dialogue box
         JPanel dialoguePanel = new JPanel();
         dialoguePanel.setLayout(new BorderLayout());
         dialoguePanel.setBackground(new Color(30, 30, 30)); // Darker background
 
-        // Create a label for the speaker's name
         String currentSpeakerName = speakerNames[dialogueIndex % speakerNames.length]; // Get current speaker name
         JLabel speakerLabel = new JLabel(currentSpeakerName);
         speakerLabel.setForeground(Color.YELLOW); // Bright color for visibility
@@ -445,7 +519,6 @@ public class Chapter1 implements GameStage {
         speakerLabel.setHorizontalAlignment(SwingConstants.LEFT);
         dialoguePanel.add(speakerLabel, BorderLayout.NORTH);
 
-        // Create a text area for the dialogue
         JTextArea dialogueTextArea = new JTextArea();
         dialogueTextArea.setForeground(Color.WHITE);
         dialogueTextArea.setFont(new Font("Monospaced", Font.PLAIN, 18));
@@ -455,11 +528,8 @@ public class Chapter1 implements GameStage {
         dialogueTextArea.setOpaque(false);
         dialogueTextArea.setMargin(new Insets(20, 20, 20, 20));
 
-        dialogueTextArea.setPreferredSize(new Dimension(500, 150)); // Fixed width and height
-
         dialoguePanel.add(dialogueTextArea, BorderLayout.CENTER);
 
-        // Create the Next button
         JButton nextButton = new JButton("Next");
         nextButton.setFont(new Font("Serif", Font.BOLD, 18));
         nextButton.setForeground(Color.WHITE);
@@ -468,31 +538,42 @@ public class Chapter1 implements GameStage {
         nextButton.setFocusPainted(false);
         nextButton.setOpaque(true);
 
-        // Action listener for the Next button
         nextButton.addActionListener(e -> {
-            dialogueIndex++; // Move to the next dialogue
-            counter++;
+            dialogueIndex++;
             if (dialogueIndex < endIndex) {
-                dialogueTextArea.setText(""); // Clear the current text
-
+                dialogueTextArea.setText("");
                 displayDialogue(startIndex, endIndex, speakerNames); // Display the next dialogue with the speakerNames array
             } else {
-                System.out.println("End of dialogues."); // Optionally handle the end
+                System.out.println("End of dialogues." + "\nDialogueIndex is: " + dialogueIndex); // Optionally handle the end
+                nextEventTrigger();
+
             }
         });
 
         dialoguePanel.add(nextButton, BorderLayout.SOUTH); // Add Next button at the bottom
 
-        // Clear previous content and display the dialogue panel
         frame.getContentPane().removeAll();
         frame.add(dialoguePanel, BorderLayout.SOUTH); // Position the dialogue panel at the bottom
         frame.revalidate();
         frame.repaint();
 
-        // Start the typewriter effect on the dialogue text
         String dialogue = narration.getDialogue(dialogueIndex);
 
         typeWriterEffect(dialogueTextArea, dialogue);
+    }
+
+    private void nextEventTrigger() {
+        if (dialogueIndex == 7) {
+            displayPlanet();
+        } else if (dialogueIndex == 10) {
+            talkToRose();
+        } else if (dialogueIndex == 14) {
+            talkToPrince();
+        } else if (dialogueIndex == 20) {
+            nextPlanet();
+        } else if (dialogueIndex == 22){
+            displayNextPlanet();
+        }
     }
 
 }
