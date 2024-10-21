@@ -1,6 +1,6 @@
 import java.util.Timer;
 import java.util.TimerTask;
-public class Base{
+abstract public class Base{
     protected String name;
     protected int maxHp;
     protected int maxExp;
@@ -18,9 +18,9 @@ public class Base{
 
     protected int expYield;
     protected Timer attackTimer;
+    protected Timer starter;
 
     public Base(){
-
     }
 
     // 4 parameters for Boss Enemies
@@ -34,7 +34,6 @@ public class Base{
         this.skill2Name = skill2Name;
         this.ultimateName = ultimateName;
         this.expYield = expYield;
-        attackTimer = new Timer();
     }
 
     // Main Character
@@ -56,7 +55,6 @@ public class Base{
         this.skill1Name = skill1Name;
         this.skill2Name = skill2Name;
         this.ultimateName = ultimateName;
-        attackTimer = new Timer();
     }
 
     // Support Character
@@ -121,28 +119,17 @@ public class Base{
     public void attack(Base target){
 
     }
-    public void setReduceHp(int damage){
-        if(currHp - damage <= 0){
+
+    public void setCurrHp(int hp){
+        if (hp < 0) {
             currHp = 0;
-        } else {
-            currHp -= damage;
-        }
+        } else currHp = Math.min(hp, maxHp);
     }
 
-    public void setAddHp(int damage){
-        if(currHp + damage >= maxHp){
-            currHp = maxHp;
-        } else {
-            currHp += maxHp;
-        }
-    }
-
-     public void setAddMana(int addMana){    
-        if(currMana + addMana >= maxMana){
-            currMana = maxMana;
-        } else {
-            currMana += addMana;
-        }
+    public void setCurrMana(int mana) {
+        if (mana < 0) {
+            currMana = 0;
+        } else currMana = Math.min(mana, maxMana);
     }
 
     public void updateMana() {
@@ -156,14 +143,6 @@ public class Base{
                 }
             }
         }, 0, 1000); // 0 initial delay, 1000 ms (1 second) interval
-    }
-
-    public void setReduceMana(int reduceMana){
-        if(currMana - reduceMana <= 0){
-            currMana = 0;
-        } else {
-            currMana -= reduceMana;
-        }
     }
 
     public void levelUp(int addExp){
@@ -211,4 +190,23 @@ public class Base{
         System.out.println("2. "+ character.nameSkill2());
         System.out.println("3. "+ character.nameUltimate()+"\n");
     }
+
+    public void resetHealth() {
+        this.setCurrHp(this.maxHp);  // Reset health to max
+    }
+
+    public void resetState() {
+        // Reset enemy timers, health, or any other state variables
+        if (attackTimer != null) {
+            attackTimer.cancel();
+            attackTimer = null; // Ensuring the attack timer is fully canceled
+        }
+        if (starter != null) {
+            starter.cancel(); // Cancel the attack timer
+        }
+        resetHealth(); // Assuming you have a method to reset enemy health
+    }
+
+    public void start(){
+    };
 }

@@ -4,48 +4,55 @@ import java.util.TimerTask;
 
 public class MainChar extends Base{
     protected int currency = 100;
-
     protected boolean isSkill1OnCooldown = false;
-    protected long skill1Duration = 1500;
+    protected long skill1Duration = 3000;
     protected int skill1ManaCost = 10;
+    protected long cdReduction = 0;
 
     protected boolean isSkill2OnCooldown = false;
-    protected long skill2Duration = 5000;
+    protected long skill2Duration = 10000;
     protected int skill2ManaCost = 30;
 
     protected boolean isUltimateOnCooldown = false;
-    protected long ultimateDuration = 10000;
+    protected long ultimateDuration = 30000;
     protected int ultimateManaCost = 70;
 
     protected boolean canUseSkill2 = false;
     protected boolean canUseUltimate = false;
 
-    protected Timer attackTimer;
-    public MainChar(String name){
-        super(name,100,100,10,100,0,100,1,1.0,"Blade Strike","Swords Dance","Judgement");
+    protected Timer skill2start = new Timer();
+    protected Timer ultimateStart = new Timer();
+
+    public MainChar(String name) {
+        super(name, 150, 100, 10, 150, 0, 100, 1, 1.0, "Blade Strike", "Swords Dance", "Judgement");
         attackTimer = new Timer();
-        // Set a 5-second delay for Skill 2
-        new Timer().schedule(new TimerTask() {
+    }
+
+    @Override
+    public void start(){
+        skill2start = new Timer();
+        skill2start.schedule(new TimerTask() {
             @Override
             public void run() {
                 canUseSkill2 = true; // Skill 2 becomes available after 5 seconds
-                System.out.println("You Skill 2 is now available!");
+                System.out.println("Your Skill 2 is now available!");
             }
-        }, 5000); // 5 seconds delay
+        }, skill2Duration); // 5 seconds delay
 
         // Set a 10-second delay for Ultimate
-        new Timer().schedule(new TimerTask() {
+        ultimateStart = new Timer();
+        ultimateStart.schedule(new TimerTask() {
             @Override
             public void run() {
                 canUseUltimate = true; // Ultimate becomes available after 10 seconds
                 System.out.println("Your Ultimate is now available!");
             }
-        }, 10000); // 10 seconds delay
+        }, ultimateDuration); // 10 seconds delay
     }
 
 
     public int skill1(Base target) {
-        setReduceMana(skill1ManaCost);
+        setCurrMana(this.currMana - skill1ManaCost);
         Random random = new Random();
         int baseDamage = 5; //setback to 5
 
@@ -55,31 +62,37 @@ public class MainChar extends Base{
             return 0;
         }
 
-        int damage = (int)((baseDamage + additionalDamage) * strength);
-        target.setReduceHp(damage);
+        double initialDamage = (baseDamage + additionalDamage);
+        initialDamage *= this.strength;
+        int damage = (int) initialDamage;
+        target.setCurrHp(target.currHp - damage);
 
         isSkill1OnCooldown = true;
+        long cooldownDuration = (cdReduction > 0) ? cdReduction : skill1Duration;
+
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
                 isSkill1OnCooldown = false; // End cooldown
+                cdReduction =  0;
             }
-        }, skill1Duration);
+        }, cooldownDuration);
         return damage;
     }
 
 
     public void skill2( ){
-        setReduceMana(skill2ManaCost);
-        this.strength += 5; // Temporary strength increase
+        setCurrMana(this.currMana - skill2ManaCost);
+        this.strength += 1; // Temporary strength increase
+
+        cdReduction = skill1Duration/2;
 
         isSkill2OnCooldown = true; // Start cooldown
-
-        // Reset cooldown after skill2CooldownDuration
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
-                strength -= 5; // Reset strength boost
+                strength -= 1; // Reset strength boost
+                cdReduction = 0;
                 isSkill2OnCooldown = false; // End cooldown
             }
         }, skill2Duration);
@@ -87,13 +100,13 @@ public class MainChar extends Base{
 
 
     public int ultimate(Base target){
-        setReduceMana(ultimateManaCost);
+        setCurrMana(this.currMana - ultimateManaCost);
         int baseDamage = 50;
 
         int missingHp = target.maxHp - target.currHp;
         int additionalDamage = (int) (0.50 * missingHp);
         int damage = (baseDamage + additionalDamage);
-        target.setReduceHp(damage);
+        target.setCurrHp(target.currHp - damage);
 
         isUltimateOnCooldown = true;
         new Timer().schedule(new TimerTask() {
@@ -152,5 +165,37 @@ public class MainChar extends Base{
             return  true; // Valid skill chosen
         }
         return false;
+    }
+
+    @Override
+    public void resetState() {
+        // Reset any cooldowns, flags, or statuses here
+        resetCooldowns();  // Assuming this method resets cooldowns
+        resetTimers();     // Assuming this method cancels and clears any active timers
+        resetHealthMana(); // Assuming this method resets health/mana if needed
+    }
+
+    public void resetCooldowns() {
+        // Reset skill cooldowns
+        isUltimateOnCooldown = false;
+        isSkill2OnCooldown = false;
+        // Any other reset logic for the character
+    }
+
+    public void resetTimers() {
+        if (attackTimer != null) {
+            attackTimer.cancel();
+            attackTimer = null;
+        }
+        if (skill2start != null) {
+            skill2start.cancel(); // Cancel the attack timer
+        }
+        if (ultimateStart != null) {
+            ultimateStart.cancel(); // Cancel the attack timer
+        }
+    }
+    public void resetHealthMana() {
+        setCurrHp(this.maxHp);  // Reset health
+        setCurrMana(this.maxMana);  // Reset mana
     }
 }

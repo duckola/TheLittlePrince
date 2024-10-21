@@ -3,27 +3,28 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class Drunkard extends Base {
-    protected Timer attackTimer;
-
     protected long initialUltimateDelay = 35000; // 30 seconds after game starts
     protected boolean isUltimateAvailable = false; // New flag for ultimate availability
     protected boolean isUltimateOnCooldown = false;
     protected long ultimateDuration = 30000;
     protected boolean isUltimateActive = false;
-
-    protected long initialSkill2Delay = 20000; // 30 seconds after game starts
-    protected boolean isSkill2Available = false;
     protected boolean isSkill2OnCooldown = false;
     protected long skill2Duration = 10000; // 10 seconds
 
     public Drunkard() {
         super("The Drunkard", 500, 500, 2.5, "Barrel Throw", "Happy Hour", "Drunken Rage",30000);
         attackTimer = new Timer();
-        new Timer().schedule(new TimerTask() {
+        starter = new Timer();
+    }
+
+    @Override
+    public void start(){
+        // Set a 10-second delay for Ultimate
+        starter.schedule(new TimerTask() {
             @Override
             public void run() {
                 isUltimateAvailable = true; // Ultimate is now available
-                System.out.println("The Drunkard's ultimate is now available!");
+                System.out.println("The Drunkards's ultimate is now available!");
             }
         }, initialUltimateDelay);
     }
@@ -87,7 +88,7 @@ public class Drunkard extends Base {
             return 0;
         }
         int damage = (int) ((baseDamage + additionalDamage) * strength);
-        target.setReduceHp(damage);
+        target.setCurrHp(target.currHp - damage);
         return damage;
     }
 
@@ -100,8 +101,8 @@ public class Drunkard extends Base {
         if (num <= 9) {
             return 0;
         }
-        int heal = (int) ((baseHeal + additionalHeal) * ((0.30)*maxHp));
-        setAddHp(heal);
+        int heal = (int) ((baseHeal + additionalHeal) + ((0.30)*currHp));
+        setCurrHp(this.currHp + heal);
 
         isSkill2OnCooldown = true;
         new Timer().schedule(new TimerTask() {

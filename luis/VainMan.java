@@ -3,7 +3,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class VainMan extends Base {
-    protected Timer attackTimer;
     protected long initialUltimateDelay = 10000; // 10 seconds after game starts
     protected boolean isUltimateAvailable = false; // New flag for ultimate availability
     protected boolean isUltimateOnCooldown = false;
@@ -13,10 +12,15 @@ public class VainMan extends Base {
     protected long skill2Duration = 10000; // 10 seconds
     protected long strengthReductionDuration = 5000;
 
-    public VainMan() {
-        super("The Vain Man", 250, 250, 1.4, "Fame Famine", "Illusory Appeal", "Ego Boost",10000);
+    public VainMan() {   // strength = 1.4
+        super("The Vain Man", 250, 250, 1.5, "Fame Famine", "Illusory Appeal", "Ego Boost",10000);
         attackTimer = new Timer();
-        new Timer().schedule(new TimerTask() {
+        starter = new Timer();
+    }
+
+    @Override
+    public void start(){
+        starter.schedule(new TimerTask() {
             @Override
             public void run() {
                 isUltimateAvailable = true; // Ultimate is now available
@@ -34,8 +38,8 @@ public class VainMan extends Base {
                     attackTimer.cancel(); // Stop attacking if target or Vain Man dies
                     return;
                 }
-                boolean skillUsed = false; // Track if a skill has been successfully used
 
+                boolean skillUsed = false; // Track if a skill has been successfully used
                 while (!skillUsed) {
                     Random random = new Random();
                     int num = random.nextInt(3);  // Randomly select a skill
@@ -84,7 +88,7 @@ public class VainMan extends Base {
             return 0;
         }
         int damage = (int) ((baseDamage + additionalDamage) * strength);
-        target.setReduceHp(damage);
+        target.setCurrHp(target.currHp - damage);
         return damage;
     }
 
@@ -113,10 +117,10 @@ public class VainMan extends Base {
             return 0;
         }
         int damage = (int) ((baseDamage + additionalDamage) * strength);
-        target.setReduceHp(damage);
+        target.setCurrHp(target.currHp - damage);
 
         double originalStrength = target.getStrength();
-        target.setStrength(originalStrength - 0.5);
+        target.setStrength(originalStrength - 0.3);
 
         new Timer().schedule(new TimerTask() {
             @Override
@@ -124,6 +128,7 @@ public class VainMan extends Base {
                 target.setStrength(originalStrength); // Restore original strength
             }
         }, strengthReductionDuration);
+
         isSkill2OnCooldown = true;
         new Timer().schedule(new TimerTask() {
             @Override
