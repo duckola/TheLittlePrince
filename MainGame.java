@@ -1,9 +1,10 @@
 import java.util.Scanner;
 
 public class MainGame extends Base{
-    public void gameStart(MainChar character, Base enemy){
+    public boolean gameStart(MainChar character, Base enemy){
         Scanner scan = new Scanner(System.in);
         boolean gameOver = false;
+        boolean leave = false;
         System.out.println("Do you wish to explore?");
         System.out.println("1. Yes");
         System.out.println("2. No");
@@ -18,7 +19,7 @@ public class MainGame extends Base{
                 }
                 case "2" -> {
                     validChoice = true;
-                    gameOver = true;
+                    leave = true;
                 }
                 default ->{
                     System.out.println("Enter a valid choice!");
@@ -26,6 +27,12 @@ public class MainGame extends Base{
                 }
             }
         }
+
+        if(leave){
+            System.out.println("\n-----Leaving Round-----");
+            return false;
+        }
+
         boolean hasAttacked = false;
         boolean isRegenMana = false;
 
@@ -38,8 +45,6 @@ public class MainGame extends Base{
                 skill = scan.nextLine();
 
                 if (character.getCurrHp() <= 0) {
-                    character.attackTimer.cancel(); // Cancel character's attack timer
-                    enemy.attackTimer.cancel();
                     System.out.println(character.getName() + " has been defeated! You Lose!");
                     gameOver = true;
                     break;
@@ -61,17 +66,14 @@ public class MainGame extends Base{
                 hasAttacked = true;
             }
             if (enemy.getCurrHp() <= 0) {
-                character.attackTimer.cancel(); // Cancel character's attack timer
-                enemy.attackTimer.cancel();
                 System.out.println("Congratulations! You Won against "+enemy.getName()+"\n");
-                character.levelUp(enemy.getExpYield());
+               // character.levelUp(enemy.getExpYield());
                 gameOver = true;
             }
         }
-
-        if(gameOver){
-            System.out.println("\n-----Round Finished-----");
-        }
-        System.exit(0); // Terminate the application
+        System.out.println("\n-----Game Over-----");
+        resetCharacterState(character);
+        resetEnemyState(enemy);
+        return true;// Terminate the application
     }
 }

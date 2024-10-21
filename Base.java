@@ -211,4 +211,14 @@ public class Base{
         System.out.println("2. "+ character.nameSkill2());
         System.out.println("3. "+ character.nameUltimate()+"\n");
     }
+    public void stopOperations(MainChar character, Base enemy) {
+        if (character.attackTimer != null) {
+            character.attackTimer.cancel(); // Stop character's timer
+            character.attackTimer = null;
+        }
+        if (enemy.attackTimer != null) {
+            enemy.attackTimer.cancel(); // Stop enemy's timer
+            enemy.attackTimer = null;
+        }
+    }
 }

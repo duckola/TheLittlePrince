@@ -47,7 +47,7 @@ public class MainChar extends Base{
     public int skill1(Base target) {
         setReduceMana(skill1ManaCost);
         Random random = new Random();
-        int baseDamage = 5; //setback to 5
+        int baseDamage = 500; //setback to 5
 
         int num = random.nextInt(100);
         int additionalDamage = num / 10;
