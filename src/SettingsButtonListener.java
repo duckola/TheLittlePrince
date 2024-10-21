@@ -5,6 +5,6 @@ import javax.swing.*;
 public class SettingsButtonListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
-        JOptionPane.showMessageDialog(null, "Opening Settings!");
+        JOptionPane.showMessageDialog(null, "Opening Tutorial!");
     }
 }

@@ -45,7 +45,7 @@ public class GameGUI {
         gbc.gridx = 4; // Move X-POSITION for the next button
 
         // Create Settings Button
-        JButton settingsButton = new JButton("Settings");
+        JButton settingsButton = new JButton("Tutorial");
         settingsButton.setFont(new Font("Serif", Font.BOLD, 20));
         settingsButton.setForeground(Color.WHITE);
         settingsButton.setBackground(new Color(255, 215, 0)); // Soft pastel yellow

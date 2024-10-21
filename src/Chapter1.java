@@ -9,18 +9,14 @@ public class Chapter1 implements GameStage {
     private JFrame frame;
     private Narration narration;
     private Timer currentTimer;
-    private int dialogueIndex = 0; // Start at dialogue 6 for `straightDialogue`
-
+    private int dialogueIndex = 0;
     public Chapter1(JFrame frame, Narration narration) {
         this.frame = frame;
         this.narration = narration;
     }
 
-    //fighting logic and exploration logic:
-
-
     @Override
-    public void showStoryline() {
+    public void showStoryline() {       
         JPanel storyPanel = new JPanel(new GridBagLayout());
         storyPanel.setBackground(Color.BLACK);
 
@@ -48,11 +44,10 @@ public class Chapter1 implements GameStage {
         skipButton.setForeground(Color.WHITE);
         skipButton.setBackground(new Color(255, 215, 0)); // Soft pastel yellow
         skipButton.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20)); // Padding
-        skipButton.setFocusPainted(false); // No focus border
-        skipButton.setOpaque(true); // Ensure background color is painted
-        skipButton.addActionListener(e -> showStage()); // Skip directly to the next part
+        skipButton.setFocusPainted(false);
+        skipButton.setOpaque(true);
+        skipButton.addActionListener(e -> showStage());
 
-        // Add hover effect to Skip button
         skipButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 skipButton.setBackground(new Color(255, 245, 0)); // Lighter shade on hover
@@ -63,7 +58,7 @@ public class Chapter1 implements GameStage {
             }
         });
 
-        gbc.gridy = 1; // Move Y-POSITION for the Skip button
+        gbc.gridy = 1; // Move Y-POSITION
         storyPanel.add(skipButton, gbc);
 
         frame.getContentPane().removeAll();
@@ -71,7 +66,7 @@ public class Chapter1 implements GameStage {
         frame.revalidate();
         frame.repaint();
 
-        showDialogue(storyTextArea, 0); //
+        showDialogue(storyTextArea, 0);
     }
 
     @Override
@@ -123,7 +118,6 @@ public class Chapter1 implements GameStage {
 
         narrationPanel.add(narrationArea, BorderLayout.CENTER);
 
-        // Clear previous content and display the narration
         frame.getContentPane().removeAll();
         frame.add(narrationPanel, BorderLayout.CENTER);
         frame.revalidate();
@@ -151,7 +145,7 @@ public class Chapter1 implements GameStage {
         narrationArea.setOpaque(false);
         narrationArea.setEditable(false);
         narrationArea.setMargin(new Insets(125, 10, 0, 10));
-        narrationArea.setPreferredSize(new Dimension(800, 400)); // Optional: set size to control the area
+        narrationArea.setPreferredSize(new Dimension(800, 400));
 
         narrationPanel.add(narrationArea, gbc);
 
@@ -164,17 +158,24 @@ public class Chapter1 implements GameStage {
 
     @Override
     public void displayChoices(JButton... buttons) {
-        JPanel buttonPanel = new JPanel(new FlowLayout());
+        // Create a JPanel with FlowLayout for centering the buttons
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 20));
         buttonPanel.setBackground(Color.BLACK);
 
+        // Add an empty border to the panel to create margin at the bottom
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 30, 10)); // Top, Left, Bottom, Right margins
+
+        // Loop through each button and set the properties
         for (JButton button : buttons) {
             // Set button properties
             button.setFont(new Font("Serif", Font.PLAIN, 18));
             button.setForeground(Color.WHITE);
             button.setBackground(new Color(255, 215, 0)); // Soft pastel yellow (golden color)
-            button.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20)); // Padding
-            button.setFocusPainted(false); // No focus border
-            button.setOpaque(true); // Ensure background color is painted
+            button.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(new Color(255, 245, 0), 2), // Yellow border
+                    BorderFactory.createEmptyBorder(10, 20, 10, 20)));           // Padding inside the button
+            button.setFocusPainted(false);
+            button.setOpaque(true);
 
             // Add a hover effect
             button.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -187,10 +188,11 @@ public class Chapter1 implements GameStage {
                 }
             });
 
-            // Add button to the panel
+            // Add the button to the panel
             buttonPanel.add(button);
         }
 
+        // Add the button panel to the frame
         frame.add(buttonPanel, BorderLayout.SOUTH);
         frame.revalidate();
         frame.repaint();
@@ -220,19 +222,18 @@ public class Chapter1 implements GameStage {
         } else {
             System.out.println("No dialogue found at this index.");
         }
-
     }
 
     @Override
     public void typeWriterEffect(String text, int delay) {
-        typeWriterEffect(text, delay, null);  // Call the version with the Runnable, but pass null as the callback
+        typeWriterEffect(text, delay, null);
     }
 
     //used in displayDialogue()
     private void typeWriterEffect(JTextArea textArea, String text) {
         new Thread(() -> {
             for (char c : text.toCharArray()) {
-                textArea.append(String.valueOf(c)); // Add one character at a time
+                textArea.append(String.valueOf(c));
                 try {
                     Thread.sleep(30); // Adjust speed (in milliseconds) of the typing effect
                 } catch (InterruptedException e) {
@@ -256,16 +257,13 @@ public class Chapter1 implements GameStage {
                 // Add the next character to the text
                 if (charIndex < text.length()) {
                     currentText.append(text.charAt(charIndex));
-                    displayNarration(currentText.toString(), onComplete); // Update the display with Skip/Next button
-
+                    displayNarration(currentText.toString(), onComplete);
                     charIndex++;
                 } else {
-                    // Stop the timer when done
                     ((Timer) e.getSource()).stop();
 
-                    // Call the onComplete callback if provided
                     if (onComplete != null) {
-                        onComplete.run();  // This will show buttons after typing finishes
+                        onComplete.run();
                     }
                 }
             }
@@ -273,6 +271,7 @@ public class Chapter1 implements GameStage {
 
         typingTimer.start();
     }
+
 
     // Dummy methods for actions
     private void checkPhone() {
@@ -369,6 +368,7 @@ public class Chapter1 implements GameStage {
                 talkToRose.addActionListener(a -> displayDialogue(dialogueIndex, stop, speakers));
             }
             displayChoices(talkToRose);
+            
         });
     }
 
@@ -396,7 +396,7 @@ public class Chapter1 implements GameStage {
         });
     }
 
-    private void displayNextPlanet(){
+    private void displayNextPlanet() {
         Timer timer2 = new Timer(3000, e2 -> {
             JLabel phase2JLabel = new JLabel("<html><center><b>The Vain Man Planet: Asteroid B-326 <\b>\n Planet 1: Gallery of the Flaring Statuette  </center></html>");
             phase2JLabel.setForeground(Color.WHITE);
@@ -562,17 +562,34 @@ public class Chapter1 implements GameStage {
         typeWriterEffect(dialogueTextArea, dialogue);
     }
 
+private void startChapter1() {
+    // Call startGame() on the same frame (no need to create a new frame)
+    StartGame chapter1 = new StartGame(frame);
+    chapter1.startGame();  // Start the game using the existing frame
+}
+
+
+
     private void nextEventTrigger() {
-        if (dialogueIndex == 7) {
-            displayPlanet();
-        } else if (dialogueIndex == 10) {
-            talkToRose();
-        } else if (dialogueIndex == 14) {
-            talkToPrince();
-        } else if (dialogueIndex == 20) {
-            nextPlanet();
-        } else if (dialogueIndex == 22){
-            displayNextPlanet();
+        switch (dialogueIndex) {
+            case 7:
+                displayPlanet();
+                break;
+            case 10:
+                talkToRose();
+                break;
+            case 14:
+                talkToPrince();
+                break;
+            case 20:
+                nextPlanet();
+                break;
+            case 22:
+                displayNextPlanet();
+                break;
+            case 24:
+                startChapter1();
+                break;
         }
     }
 

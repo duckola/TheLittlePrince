@@ -7,16 +7,17 @@ public class StartButtonListener implements ActionListener {
 
     private JFrame frame;
     private Narration narration;
-    private Chapter1 startGame;
-
+    private Chapter1 chapter1;
     public StartButtonListener(JFrame frame) {
         this.frame = frame; 
         this.narration = new Narration(); 
-        this.startGame = new Chapter1(frame,narration);
+        this.chapter1 = new Chapter1(frame,narration);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        startGame.showStoryline();
+        chapter1.showStoryline();
     }
 }
+
+
