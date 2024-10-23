@@ -54,22 +54,25 @@ public class MainGame extends Base{
                     gameOver = true;
                     break;
                 }
-                switch (skill) {
-                    case "1" -> validSkill = character.chooseSkill1(enemy);
-                    case "2" -> validSkill = character.chooseSkill2();
-                    case "3" -> validSkill = character.chooseUltimate(enemy);
-                    default -> System.out.println("Invalid choice! Please select a valid skill.");
+                if (character.isParalyzed()) {
+                    System.out.println("You are paralyzed!");
+                } else {
+                    switch (skill) {
+                        case "1" -> validSkill = character.chooseSkill1(enemy);
+                        case "2" -> validSkill = character.chooseSkill2();
+                        case "3" -> validSkill = character.chooseUltimate(enemy);
+                        default -> System.out.println("Invalid choice! Please select a valid skill.");
+                    }
                 }
-
                 if(!isRegenMana) {
                     character.updateMana();
                     isRegenMana = true;
                 }
             }
-//            if (!hasAttacked){
-//                enemy.attack(character);
-//                hasAttacked = true;
-//            }
+            if (!hasAttacked){
+                enemy.attack(character);
+                hasAttacked = true;
+            }
             if (enemy.getCurrHp() <= 0) {
                 System.out.println("Congratulations! You Won against "+enemy.getName()+"\n");
                 character.levelUp(enemy.getExpYield());

@@ -3,16 +3,16 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class Drunkard extends Base {
-    protected long initialUltimateDelay = 35000; // 30 seconds after game starts
-    protected boolean isUltimateAvailable = false; // New flag for ultimate availability
     protected boolean isUltimateOnCooldown = false;
-    protected long ultimateDuration = 30000;
-    protected boolean isUltimateActive = false;
-    protected boolean isSkill2OnCooldown = false;
-    protected long skill2Duration = 10000; // 10 seconds
+    protected boolean isUltimateAvailable = false;
+    protected long ultimateCooldownDuration = 35000;
+    protected long paralyzeDuration = 6000;
 
-    public Drunkard() {
-        super("The Drunkard", 500, 500, 2.5, "Barrel Throw", "Happy Hour", "Drunken Rage",30000);
+    protected boolean isSkill2OnCooldown = false;
+    protected long skill2CooldownDuration = 20000; // 10 seconds
+
+    public Drunkard() { //2.5 strength
+        super("The Drunkard", 500, 500, 2.1, "Wine Blast", "Happy Hour", "Drunken Rage",50000);
         attackTimer = new Timer();
         starter = new Timer();
     }
@@ -24,9 +24,9 @@ public class Drunkard extends Base {
             @Override
             public void run() {
                 isUltimateAvailable = true; // Ultimate is now available
-                System.out.println("The Drunkards's ultimate is now available!");
+                System.out.println("The Drunkard's ultimate is now available!");
             }
-        }, initialUltimateDelay);
+        }, ultimateCooldownDuration);
     }
 
     @Override
@@ -45,15 +45,17 @@ public class Drunkard extends Base {
                     int num = random.nextInt(3);  // Randomly select a skill
 
                     if (num == 0) {  // Skill 1
-                        int damageDealt = skill1(target);
+                        int damageDealt = skill1();
                         System.out.println("The Drunkard used " + nameSkill1());
                         System.out.println("The Drunkard deals " + damageDealt + " damage to " + target.getName());
+                        target.setCurrHp(target.currHp - damageDealt);
                         skillUsed = true; // Skill successfully used
                     } else if (num == 1) {  // Ultimate
-                        if (!isUltimateOnCooldown) {
-                            ultimate();
+                        if (!isUltimateOnCooldown && isUltimateAvailable) {
+                            int damageDealt = ultimate(target);
                             System.out.println("The Drunkard used " + nameUltimate());
-                            System.out.println("The Drunkard has boosted his strength.");
+                            System.out.println("The Drunkard deals " + damageDealt + " damage and has paralyzed " + target.getName() + " for 6 seconds");
+                            target.setCurrHp(target.currHp - damageDealt);
                             skillUsed = true; // Skill successfully used
                         }
                     } else {  // Skill 2
@@ -78,7 +80,7 @@ public class Drunkard extends Base {
     }
 
 
-    public int skill1(Base target) {
+    public int skill1() {
         Random random = new Random();
         int baseDamage = 20;
 
@@ -87,21 +89,19 @@ public class Drunkard extends Base {
         if (num <= 9) {
             return 0;
         }
-        int damage = (int) ((baseDamage + additionalDamage) * strength);
-        target.setCurrHp(target.currHp - damage);
-        return damage;
+        return (int) ((baseDamage + additionalDamage) * strength);
     }
 
-    public int skill2() { // equal ang weight nila sa skill so not considered as ultimate
+    public int skill2() {
         Random random = new Random();
-        int baseHeal = 20;
+        int baseHeal = 10;
 
         int num = random.nextInt(100);
         int additionalHeal = num / 10;
         if (num <= 9) {
             return 0;
         }
-        int heal = (int) ((baseHeal + additionalHeal) + ((0.30)*currHp));
+        int heal = (int) ((baseHeal + additionalHeal) + ((0.2)*currHp));
         setCurrHp(this.currHp + heal);
 
         isSkill2OnCooldown = true;
@@ -110,22 +110,37 @@ public class Drunkard extends Base {
             public void run() {
                 isSkill2OnCooldown = false; // End cooldown
             }
-        }, skill2Duration);
+        }, skill2CooldownDuration);
         return heal;
     }
 
-    public void ultimate(){
-        isUltimateActive = true; // Activate the boost
-        double originalStrength = getStrength();
-        setStrength(originalStrength+2);
+    public int ultimate(Base target){
+        Random random = new Random();
+        int baseDamage = 40;
+
+        int num = random.nextInt(100);
+        int additionalDamage = num / 10;
+        if (num <= 9) {
+            return 0;
+        }
+        int damage = (int) ((baseDamage + additionalDamage) * strength);
+
+        target.setParalyzed(true);
+
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                target.setParalyzed(false); // Restore original state
+            }
+        }, paralyzeDuration);
 
         isUltimateOnCooldown = true;
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
-                setStrength(originalStrength);
                 isUltimateOnCooldown = false; // Cooldown ends after 15 seconds
             }
-        }, ultimateDuration);
+        }, ultimateCooldownDuration);
+        return damage;
     }
 }

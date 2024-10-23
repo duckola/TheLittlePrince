@@ -2,18 +2,18 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class VainMan extends Base {
-    protected long initialUltimateDelay = 10000; // 10 seconds after game starts
+public class VainMan extends Base { // 10 seconds after game starts
     protected boolean isUltimateAvailable = false; // New flag for ultimate availability
     protected boolean isUltimateOnCooldown = false;
-    protected long ultimateDuration = 30000;
-    protected boolean isUltimateActive = false;
+    protected long ultimateCooldownDuration = 30000;
+    protected long ultimateActiveDuration = 10000;
+
     protected boolean isSkill2OnCooldown = false;
     protected long skill2Duration = 10000; // 10 seconds
-    protected long strengthReductionDuration = 5000;
+    protected long strengthReductionDuration = 4000;
 
     public VainMan() {   // strength = 1.4
-        super("The Vain Man", 250, 250, 1.5, "Fame Famine", "Illusory Appeal", "Ego Boost",10000);
+        super("The Vain Man", 250, 250, 1.4, "Fame Famine", "Illusory Appeal", "Ego Boost",15000);
         attackTimer = new Timer();
         starter = new Timer();
     }
@@ -26,7 +26,7 @@ public class VainMan extends Base {
                 isUltimateAvailable = true; // Ultimate is now available
                 System.out.println("The Vain Man's ultimate is now available!");
             }
-        }, initialUltimateDelay);
+        }, ultimateCooldownDuration);
     }
 
     @Override
@@ -45,12 +45,13 @@ public class VainMan extends Base {
                     int num = random.nextInt(3);  // Randomly select a skill
 
                     if (num == 0) {  // Skill 1
-                        int damageDealt = skill1(target);
+                        int damageDealt = skill1();
                         System.out.println("The Vain Man used " + nameSkill1());
                         System.out.println("The Vain Man deals " + damageDealt + " damage to " + target.getName());
+                        target.setCurrHp(target.currHp - damageDealt);
                         skillUsed = true; // Skill successfully used
                     } else if (num == 1) {  // Ultimate
-                        if (!isUltimateOnCooldown) {
+                        if (!isUltimateOnCooldown && isUltimateAvailable) {
                             ultimate();
                             System.out.println("The Vain Man used " + nameUltimate());
                             System.out.println("The Vain Man has boosted his strength.");
@@ -61,6 +62,7 @@ public class VainMan extends Base {
                             int damageDealt = skill2(target);
                             System.out.println("The Vain Man used " + nameSkill2());
                             System.out.println("The Vain Man deals " + damageDealt + " damage to " + target.getName() + " and reduced their strength.");
+                            target.setCurrHp(target.currHp - damageDealt);
                             skillUsed = true; // Skill successfully used
                         }
                     }
@@ -78,7 +80,7 @@ public class VainMan extends Base {
     }
 
 
-    public int skill1(Base target) {
+    public int skill1() {
         Random random = new Random();
         int baseDamage = 30;
 
@@ -87,29 +89,32 @@ public class VainMan extends Base {
         if (num <= 9) {
             return 0;
         }
-        int damage = (int) ((baseDamage + additionalDamage) * strength);
-        target.setCurrHp(target.currHp - damage);
-        return damage;
+        return (int) ((baseDamage + additionalDamage) * strength);
     }
 
     public void ultimate(){
-        isUltimateActive = true; // Activate the boost
         double originalStrength = getStrength();
         setStrength(originalStrength+2);
+
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                setStrength(originalStrength);
+            }
+        }, ultimateActiveDuration);
 
         isUltimateOnCooldown = true;
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
-                setStrength(originalStrength);
                 isUltimateOnCooldown = false; // Cooldown ends after 15 seconds
             }
-        }, ultimateDuration);
+        }, ultimateCooldownDuration);
     }
 
-    public int skill2(Base target) { // equal ang weight nila sa skill so not considered as ultimate
+    public int skill2(Base target) {
         Random random = new Random();
-        int baseDamage = 20;
+        int baseDamage = 15;
 
         int num = random.nextInt(100);
         int additionalDamage = num / 10;
@@ -117,7 +122,6 @@ public class VainMan extends Base {
             return 0;
         }
         int damage = (int) ((baseDamage + additionalDamage) * strength);
-        target.setCurrHp(target.currHp - damage);
 
         double originalStrength = target.getStrength();
         target.setStrength(originalStrength - 0.3);
