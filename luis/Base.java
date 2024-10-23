@@ -1,3 +1,4 @@
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 abstract public class Base{
@@ -20,6 +21,7 @@ abstract public class Base{
     protected Timer attackTimer;
     protected Timer starter;
 
+    protected boolean isParalyzed = false;
     public Base(){
     }
 
@@ -164,9 +166,12 @@ abstract public class Base{
         }
     }
 
-    public void clear(){  
-        System.out.print("\033[H\033[2J");  
-        System.out.flush();  
+    public boolean isParalyzed() {
+        return isParalyzed;
+    }
+
+    public void setParalyzed(boolean paralyzed) {
+        this.isParalyzed = paralyzed;
     }
 
     public void displayStats(Base team, Base enemy){
@@ -195,7 +200,7 @@ abstract public class Base{
         this.setCurrHp(this.maxHp);  // Reset health to max
     }
 
-    public void resetState() {
+    public void resetTimers(){
         // Reset enemy timers, health, or any other state variables
         if (attackTimer != null) {
             attackTimer.cancel();
@@ -204,9 +209,14 @@ abstract public class Base{
         if (starter != null) {
             starter.cancel(); // Cancel the attack timer
         }
+    }
+
+    public void resetState() {
+        resetTimers();
         resetHealth(); // Assuming you have a method to reset enemy health
     }
 
     public void start(){
     };
+
 }
